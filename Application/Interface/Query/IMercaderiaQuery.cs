@@ -4,9 +4,9 @@ namespace Application.Interface.Query
 {
     public interface IMercaderiaQuery
     {
-        List<Mercaderia> GetListmercaderia();
-        Mercaderia GetMercaderiaId(int mercaderiaId);
-        List<Mercaderia> GetListmercaderia(string nombre);
+        Task<List<Mercaderia>> GetListmercaderia();
+        Task<Mercaderia> GetMercaderiaId(int mercaderiaId);
+        Task<List<Mercaderia>> GetListmercaderia(string nombre);
         Task<Mercaderia> GetSeach(string nombre);
     }
 }

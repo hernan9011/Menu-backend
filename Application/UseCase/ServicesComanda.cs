@@ -27,30 +27,26 @@ namespace Application.UseCase
             _mercaderia = mercaderia;
             _querycomMer = querycomMer;
         }
-        public Task<List<ComandaResponse>> GetSearchId(string? fecha)
+ 
+        public async Task<List<ComandaResponse>> GetSearchId(string? fecha)
         {
+            var comandas = await _query.GetListComanda();
             if (!fecha.IsNullOrEmpty())
             {
-                DateTime datafecha = DateTime.Parse(fecha);
-                var mer = _query.GetListComanda().FindAll(s => s.Fecha == datafecha).ToList();
-                var conber = _mapper.Map<List<ComandaResponse>>(mer);
-                return Task.FromResult(conber);
+                comandas = comandas.Where(s => s.Fecha == DateTime.Parse(fecha)).ToList();
             }
-            else
-            {
-                var mer = _query.GetListComanda().ToList();
-                var conber = _mapper.Map<List<ComandaResponse>>(mer);
-                return Task.FromResult(conber);
-            }     
+            var conber = _mapper.Map<List<ComandaResponse>>(comandas);
+            return conber;
         }
 
-        public Task<ComandaGetResponse> GetSearchId(Guid Id)
+        public async Task<ComandaGetResponse> GetSearchId(Guid Id)
         {
-            var item = _query.GetComandaId(Id);
+            var item = await _query.GetComandaId(Id);
             var com = _mapper.Map<ComandaGetResponse>(item);
-            return Task.FromResult(com);
+            return com;
         }
-        public Task<ComandaResponse> InsertCom(ComandaRequest request)
+        
+        public async Task<ComandaResponse> InsertCom(ComandaRequest request)
         {   
             Guid newComandaId = Guid.NewGuid();
             int PrecioTotal = 0;
@@ -58,17 +54,18 @@ namespace Application.UseCase
 
             foreach (var num in request.Mercaderias)
             {
-                Pedido.Add(_mercaderia.GetMercaderiaId(num));
-                PrecioTotal += _mercaderia.GetMercaderiaId(num).Precio;
+                Pedido.Add( await _mercaderia.GetMercaderiaId(num));
+                var mercaderia = await _mercaderia.GetMercaderiaId(num);
+                PrecioTotal += mercaderia.Precio;
             }
-            _command.InsertComanda( newComandaId , request.FormaEntrega, PrecioTotal);
+            await _command.InsertComanda( newComandaId , request.FormaEntrega, PrecioTotal);
             for (int i = 0; i < Pedido.Count; i++)
             {
-                _querycomMer.InsertComandaMercaderia(newComandaId, Pedido[i].MercaderiaId);
+              await  _querycomMer.InsertComandaMercaderia(newComandaId, Pedido[i].MercaderiaId);
             }
-            var item = _query.GetComandaId(newComandaId);
+            var item = await _query.GetComandaId(newComandaId);
             var com = _mapper.Map<ComandaResponse>(item);
-            return Task.FromResult(com);
+            return com;
         }
 
     }

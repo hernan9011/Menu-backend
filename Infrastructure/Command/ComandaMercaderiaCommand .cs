@@ -11,15 +11,15 @@ namespace Infrastructure.Command
         {
             _context = context;
         }   
-        public void InsertComandaMercaderia(Guid newComandaId, int id)
+        public async Task InsertComandaMercaderia(Guid newComandaId, int id)
         {
              ComandaMercaderia comandaMercaderia = new()
              {
                 ComandaId = newComandaId,
                 MercaderiaId = id
             };
-            _context.Add(comandaMercaderia);
-            _context.SaveChanges();
+            _context.ComandaMercaderia.Add(comandaMercaderia);
+            await _context.SaveChangesAsync();
         }
 
         public void RemoveComandaMercaderia(int comandaId)

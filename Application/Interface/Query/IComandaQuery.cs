@@ -4,7 +4,7 @@ namespace Application.Interface.Query
 {
     public interface IComandaQuery
     {
-        List<Comanda> GetListComanda();
-        Comanda GetComandaId(Guid comandaId);
+        Task<List<Comanda>> GetListComanda();
+        Task<Comanda> GetComandaId(Guid comandaId);
     }
 }

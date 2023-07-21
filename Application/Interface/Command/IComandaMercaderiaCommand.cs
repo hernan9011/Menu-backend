@@ -2,7 +2,7 @@
 {
     public interface IComandaMercaderiaCommand
     {
-        void InsertComandaMercaderia(Guid newComandaId, int id);
+        Task InsertComandaMercaderia(Guid newComandaId, int id);
         void RemoveComandaMercaderia(int comandaId);
     }
 }

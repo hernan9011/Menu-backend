@@ -13,27 +13,26 @@ namespace Infrastructure.Query
             _context = context;
         }
 
-        public List<Comanda> GetListComanda()
-        { 
-            var comandas = _context.Comanda
+        public async Task<List<Comanda>> GetListComanda()
+        {
+            var comandas = await _context.Comanda
                 .Include(s => s.FKFormaEntrega)
                 .Include(s => s.LsComandaMercaderia)
-                 .ThenInclude(s => s.FKMercaderia)
-                .OrderBy(s => s.Fecha)
-                .ToList();
-            return comandas;         
-        } 
-        
-        public Comanda GetComandaId(Guid comandaId)
-        {
-            var comandas = _context.Comanda
-             .Include(s => s.FKFormaEntrega)
-             .Include(s => s.LsComandaMercaderia)
-              .ThenInclude(s => s.FKMercaderia)
-              .ThenInclude(s => s.FKTipoMercaderia)
-             .FirstOrDefault(s => s.ComandaId == comandaId);
+                .ThenInclude(s => s.FKMercaderia)
+                .ToListAsync();
+            comandas = comandas.OrderBy(s => s.Fecha).ToList();
             return comandas;
         }
 
+        public async Task<Comanda> GetComandaId(Guid comandaId)
+        {
+            var comandas = await _context.Comanda
+                .Include(s => s.FKFormaEntrega)
+                .Include(s => s.LsComandaMercaderia)
+                .ThenInclude(s => s.FKMercaderia)
+                .ThenInclude(s => s.FKTipoMercaderia)
+                .FirstOrDefaultAsync(s => s.ComandaId == comandaId);
+            return comandas;
+        }
     }
 }

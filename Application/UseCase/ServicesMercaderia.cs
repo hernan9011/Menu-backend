@@ -33,11 +33,11 @@ namespace Application.UseCase
             List<Mercaderia> mer;
             if (string.IsNullOrEmpty(nombre))
             {
-                mer = _query.GetListmercaderia();
+                mer = await _query.GetListmercaderia();
             }
             else
             {
-                mer = _query.GetListmercaderia(nombre.ToUpper());
+                mer = await _query.GetListmercaderia(nombre.ToUpper());
             }
             if (tipo != null)
             {
@@ -51,7 +51,8 @@ namespace Application.UseCase
             }
             return _mapper.Map<List<MercaderiaGetResponse>>(mercaderias);
         }
-        public Task<MercaderiaResponse> InsertMer(MercaderiaRequest request)
+
+        public async Task<MercaderiaResponse> InsertMer(MercaderiaRequest request)
         {
             var mercaderia = new Mercaderia
             {
@@ -63,21 +64,21 @@ namespace Application.UseCase
                 Imagen = request.Imagen,
             };
             _command.InsertMercaderia(mercaderia);
-            var item = _query.GetListmercaderia().First(s => s.Nombre == request.Nombre.ToUpper());
-            var mer = _mapper.Map<MercaderiaResponse>(item);
-            return Task.FromResult(mer);
+            var List = await _query.GetListmercaderia();
+            var result = _mapper.Map<MercaderiaResponse>(List.FirstOrDefault(s => s.Nombre == request.Nombre.ToUpper()));
+            return result;
         }
 
-        public Task<MercaderiaResponse> GetMerId(int mercaderiaId)
+        public async Task<MercaderiaResponse> GetMerId(int mercaderiaId)
         {
-            var mercaderia = _query.GetMercaderiaId(mercaderiaId);
-            var mer = _mapper.Map<MercaderiaResponse>(mercaderia);
-            return Task.FromResult(mer);
+            var mercaderia =await _query.GetMercaderiaId(mercaderiaId);
+            var result = _mapper.Map<MercaderiaResponse>(mercaderia);
+            return result;
         }
 
-        public Task<MercaderiaResponse> PutMerId(int Id, MercaderiaRequest request)
+        public async Task<MercaderiaResponse> PutMerId(int Id, MercaderiaRequest request)
         {
-            var mercaderia = _query.GetMercaderiaId(Id);
+            var mercaderia =await _query.GetMercaderiaId(Id);
             mercaderia.Nombre = request.Nombre;
             mercaderia.TipoMercaderiaId = request.Tipo;
             mercaderia.Precio = (int)request.Precio;
@@ -86,22 +87,22 @@ namespace Application.UseCase
             mercaderia.Imagen = request.Imagen;
             _command.UpdateMercaderia(mercaderia);
             var mer = _mapper.Map<MercaderiaResponse>(mercaderia);
-            return Task.FromResult(mer);
+            return mer;
         }
-        public Task<MercaderiaResponse> RemoveMer(int Id)
+        public async Task<MercaderiaResponse> RemoveMer(int Id)
         {
-            var mercaderia = _query.GetMercaderiaId(Id);
+            var mercaderia =await _query.GetMercaderiaId(Id);
             var condicion = _querycom.GetListComandaMercaderia().FirstOrDefault(s => s.MercaderiaId == Id);
 
             if (mercaderia != null && condicion == null)
             {
-                var mer = _mapper.Map<MercaderiaResponse>(mercaderia);
+                var result = _mapper.Map<MercaderiaResponse>(mercaderia);
                 _command.RemoveMercaderia(mercaderia);
-                return Task.FromResult(mer);
+                return result;
             }
             else
             {
-                return Task.FromResult(new MercaderiaResponse());
+                return new MercaderiaResponse();
             }
         }
 

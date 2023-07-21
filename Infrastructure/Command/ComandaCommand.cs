@@ -11,7 +11,7 @@ namespace Infrastructure.Command
         {
             _context = context;
         }
-        public void InsertComanda(Guid newComandaId, int id, int precioTotal)
+        public async Task InsertComanda(Guid newComandaId, int id, int precioTotal)
         {
               Comanda comanda = new()
               {
@@ -20,8 +20,8 @@ namespace Infrastructure.Command
                 PrecioTotal = precioTotal,
                 Fecha = DateTime.Now
             };
-            _context.Add(comanda);
-            _context.SaveChanges();
+            _context.Comanda.Add(comanda);
+            await _context.SaveChangesAsync();
         }
 
         public void RemoveComanda(int comandaId)
