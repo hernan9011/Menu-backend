@@ -30,25 +30,19 @@ namespace Application.UseCase
         {
             orden ??= "asc";
             List<Mercaderia> mercaderias;
-            List<Mercaderia> mer;
-            if (string.IsNullOrEmpty(nombre))
-            {
-                mer = await _query.GetListmercaderia();
-            }
-            else
-            {
-                mer = await _query.GetListmercaderia(nombre.ToUpper());
-            }
-            if (tipo != null)
-            {
-                mercaderias = orden.ToLower() == "desc" ? mer.FindAll(s => s.TipoMercaderiaId == tipo)
-                 .OrderByDescending(x => x.Precio).ToList() : mer.FindAll(s => s.TipoMercaderiaId == tipo).OrderBy(x => x.Precio).ToList();
-            }
-            else
-            {
-                mercaderias = orden.ToLower() == "desc" ? mer.OrderByDescending(x => x.Precio).ToList() : mer
-                        .OrderBy(x => x.Precio).ToList();
-            }
+            List<Mercaderia> mer = string.IsNullOrEmpty(nombre)
+                ? await _query.GetListmercaderia()
+                : await _query.GetListmercaderia(nombre.ToUpper());
+
+            mercaderias = tipo != null
+            ? (orden.ToLower() == "desc" 
+                    ? mer.Where(s => s.TipoMercaderiaId == tipo).OrderByDescending(x => x.Precio).ToList()
+                    : mer.Where(s => s.TipoMercaderiaId == tipo).OrderBy(x => x.Precio).ToList())
+            
+            : (orden.ToLower() == "desc" 
+                    ? mer.OrderByDescending(x => x.Precio).ToList()
+                    : mer.OrderBy(x => x.Precio).ToList());
+
             return _mapper.Map<List<MercaderiaGetResponse>>(mercaderias);
         }
 
@@ -108,9 +102,8 @@ namespace Application.UseCase
 
         public async Task<Mercaderia> Search(string nombre)
         {
-            var mer = await _query.GetSeach(nombre.ToUpper());
-            
-            return mer;
+            var result = await _query.GetSeach(nombre.ToUpper());
+            return result;
         }
     }
 }
